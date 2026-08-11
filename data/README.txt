@@ -1,0 +1,1 @@
+Progress is stored here when the local launcher is used.

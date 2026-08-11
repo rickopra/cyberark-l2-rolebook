@@ -1,0 +1,18 @@
+﻿# Public-safe local files
+_transcripts/
+.chrome-test/
+chrome-*.log
+*.log
+
+# Personal/local state
+/data/progress.json
+/data/server.json
+
+# Local/private reference documents
+*.pdf
+*.docx
+
+# OS/editor files
+.DS_Store
+Thumbs.db
+.vscode/

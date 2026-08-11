@@ -1,0 +1,16 @@
+﻿CYBERARK L2 ROLEBOOK — START HERE
+
+1. Double-click "Open CyberArk Rolebook.vbs".
+2. Browser akan terbuka otomatis ke aplikasi lokal.
+3. Progress tersimpan otomatis di folder data\progress.json.
+4. Sebelum memindahkan folder ke laptop/PC lain, tutup browser lalu gunakan menu Progress & Backup > Export progress JSON sebagai backup tambahan.
+5. Copy seluruh folder ROLEBOOK CYBERARK ke endpoint baru. Jalankan kembali file VBS dari folder baru.
+
+Fallback:
+- Jika VBS diblokir oleh endpoint policy, gunakan "Open CyberArk Rolebook.cmd".
+- HTML dapat dibuka langsung, tetapi mode tersebut hanya memakai browser storage dan tidak menjamin progress ikut saat folder dipindahkan.
+
+Safety:
+- Jangan menyimpan password, token, key, atau identifier customer sensitif pada notebook.
+- Prosedur Vault/DR, failover, recovery, reconcile, certificate, dan perubahan production harus mengikuti build aktual, approved change, serta SOP customer/vendor.
+PAM: Reference library is now the primary explainer.

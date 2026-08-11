@@ -1,0 +1,18 @@
+﻿function sourceById(id){return (window.REFERENCE_DATA.sources||[]).find(source=>source.id===id)}
+function sourceMarks(ids=[]){return `<span class="source-marks">${ids.map(id=>`<button type="button" class="source-mark" data-action="open-source" data-source="${esc(id)}" aria-label="Open source ${esc(id)}">[${esc(id)}]</button>`).join('')}</span>`}
+function refList(value){return (Array.isArray(value)?value:(value?[value]:[])).map(item=>`<li>${esc(item)}</li>`).join('')}
+function refSections(entry){return (entry.sections||[]).map(section=>`<section class="chapter-section"><h4>${esc(label(section.title))}</h4>${(section.paragraphs||[]).map(paragraph=>`<p>${esc(label(paragraph.text))} ${sourceMarks(paragraph.refs||entry.sources)}</p>`).join('')}${refItems(label(section.bullets)).length?`<ul>${refList(label(section.bullets))}</ul>`:''}</section>`).join('')}
+function readFirstPanel(module){
+  const map=window.REFERENCE_DATA.modulePrerequisites?.[module.id];if(!map)return '';
+  const entries=window.REFERENCE_DATA.entries;
+  const required=(map.required||[]).map(id=>entries.find(item=>item.id===id)).filter(Boolean);
+  const recommended=(map.recommended||[]).map(id=>entries.find(item=>item.id===id)).filter(Boolean);
+  const minutes=required.reduce((sum,item)=>sum+(item.readingTime||0),0);
+  const buttons=(items,kind)=>items.map(item=>`<button type="button" class="prereq-link ${kind}" data-action="open-reference" data-reference="${item.id}"><span>${esc(label(item.title))}</span><small>${item.readingTime||'—'} min · ${esc(item.term)}</small></button>`).join('');
+  return `<section class="read-first" aria-labelledby="readFirstTitle"><div class="read-first-head"><div><div class="eyebrow">${esc(state.lang==='id'?'BACA DULU':'READ FIRST')}</div><h3 id="readFirstTitle">${esc(state.lang==='id'?'Fondasi sebelum modul ini':'Foundations before this module')}</h3><p>${esc(state.lang==='id'?`Baca artikel wajib terlebih dahulu. Estimasi ${minutes} menit; tidak ada hard lock.`:`Read the required articles first. Estimated ${minutes} minutes; there is no hard lock.`)}</p></div><span class="badge current">${required.length} ${esc(state.lang==='id'?'wajib':'required')}</span></div><div class="prereq-grid">${buttons(required,'required')}${buttons(recommended,'recommended')}</div></section>`;
+}
+function bibliography(query=''){
+  const sources=window.REFERENCE_DATA.sources||[],needle=query.toLowerCase();
+  const items=sources.filter(source=>`${source.id} ${source.title} ${source.publisher} ${source.type}`.toLowerCase().includes(needle));
+  return `<div class="bibliography-intro card card-pad"><div class="eyebrow">BIBLIOGRAPHY · ${sources.length} SOURCES</div><h3>${esc(state.lang==='id'?'Katalog sumber dan provenance':'Source catalogue and provenance')}</h3><p>${esc(label(window.REFERENCE_DATA.methodology))}</p></div><div class="source-catalog">${items.map(source=>{const usedBy=window.REFERENCE_DATA.entries.filter(entry=>(entry.sources||[]).includes(source.id));return `<article class="source-record ${runtime.activeSource===source.id?'active':''}" id="source-${esc(source.id)}"><div class="source-record-top"><span class="source-id">[${esc(source.id)}]</span><span class="badge">${esc(source.type)}</span></div><h3>${esc(source.title)}</h3><p class="small">${esc(source.publisher)} · ${esc(source.accessed)}</p><p class="small">${esc(state.lang==='id'?'Dipakai oleh':'Used by')}: ${usedBy.length?usedBy.map(entry=>esc(label(entry.title))).join(' · '):'—'}</p><div class="page-actions"><a class="small-btn" href="${esc(source.url)}" target="_blank" rel="noreferrer">${esc(state.lang==='id'?'Buka sumber resmi ↗':'Open source ↗')}</a></div></article>`}).join('')}</div>`;
+}
