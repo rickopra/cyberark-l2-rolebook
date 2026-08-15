@@ -85,3 +85,5 @@
 @media (max-width: 820px) { .evidence-grid { grid-template-columns: 1fr; gap: 14px; } .article-sources { grid-template-columns: 1fr; } .prereq-grid { grid-template-columns: 1fr; } }
 
 
+
+.brand-logo{width:26px;height:26px;flex:0 0 auto;display:block}.brand-mark span{display:inline-block}

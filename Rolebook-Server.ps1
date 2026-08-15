@@ -76,6 +76,8 @@ $Static=@{
   '/rolebook-assets/rolebook-library-helpers.js'='rolebook-assets\rolebook-library-helpers.js'
   '/rolebook-assets/inject-cyberbrainer.js'='rolebook-assets\inject-cyberbrainer.js'
   '/rolebook-assets/inject-idira-training.js'='rolebook-assets\inject-idira-training.js'
+  '/rolebook-assets/docs-explorer.js'='rolebook-assets\docs-explorer.js'
+  '/rolebook-assets/icon-idira-logo.svg'='rolebook-assets\icon-idira-logo.svg'
   '/CyberArk_L2_Support_Engineer_Rolebook_Ricko(1).docx'='CyberArk_L2_Support_Engineer_Rolebook_Ricko(1).docx'
 }
 Open-Rolebook $Port
@@ -99,7 +101,7 @@ try{
       if($Static.ContainsKey($request.Path)){
         $file=Join-Path $Root $Static[$request.Path]
         if(Test-Path $file){
-          $ext=[IO.Path]::GetExtension($file).ToLowerInvariant();$type=@{'.html'='text/html; charset=utf-8';'.css'='text/css; charset=utf-8';'.js'='application/javascript; charset=utf-8';'.docx'='application/vnd.openxmlformats-officedocument.wordprocessingml.document'}[$ext]
+          $ext=[IO.Path]::GetExtension($file).ToLowerInvariant();$type=@{'.html'='text/html; charset=utf-8';'.css'='text/css; charset=utf-8';'.js'='application/javascript; charset=utf-8';'.svg'='image/svg+xml';'.docx'='application/vnd.openxmlformats-officedocument.wordprocessingml.document'}[$ext]
           Send-Response $stream 200 $type (Read-SharedBytes $file);continue
         }
       }

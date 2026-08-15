@@ -28,8 +28,46 @@
   ms.forEach(m=>{
     const sid='IDIRA-PAM-ADMIN-M'+m.n;
     data.sources.push({id:sid,title:'PAM Administration M'+m.n+' - '+m.t,publisher:'Idira / CyberArk legacy training',type:'Training PDF (local)',url:'https://docs.cyberark.com/',accessed:'2026-08-15',note:'File lokal: MATERIAL TRAINING/MATERIAL TRAINING'});
-    data.entries.push({id:'idira-pam-admin-m'+m.n,category:m.c,term:'Idira PAM Admin M'+m.n+': '+m.t,title:R('M'+m.n+' - '+m.t,'M'+m.n+' - '+m.t),what:R(m.s,m.s),simple:R('Sub-modul belajar administrator PAM.','PAM administrator study sub-module.'),job:A(m.k,m.k),flow:A([m.f],[m.f]),l2:A([m.l],[m.l]),boundary:A(['Ringkasan/parafrasa; detail menu, command, port, dan recovery wajib dicocokkan dengan release serta runbook customer.'],['Summary/paraphrase; menus, commands, ports, and recovery must be checked against the release and customer runbook.']),sources:[sid,'IDIRA-PAM-ADMIN-BUNDLE'],related:m.r,readingTime:10,aliases:['CyberArk PAM Admin M'+m.n]});
+    data.entries.push({id:'idira-pam-admin-m'+m.n,category:m.c,term:'Idira PAM Admin M'+m.n+': '+m.t,title:R('M'+m.n+' - '+m.t,'M'+m.n+' - '+m.t),what:R(m.s,m.s),simple:R('Sub-modul belajar administrator PAM.','PAM administrator study sub-module.'),job:A(m.k,m.k),flow:A([m.f],[m.f]),l2:A([m.l],[m.l]),boundary:A(['Ringkasan/parafrasa ini hanya mengambil pokok materi PDF training terkait.'],['This summary/paraphrase only uses the related training PDF.']),failureModes:A([m.l],[m.l]),evidence:A(['Flow: '+m.f,'Catatan L2: '+m.l,'Dokumen sumber: M'+m.n+' - '+m.t],['Flow: '+m.f,'L2 note: '+m.l,'Source document: M'+m.n+' - '+m.t]),sections:[{title:R('Ringkasan modul','Module summary'),paragraphs:[{text:R(m.s,m.s),refs:[sid]}]},{title:R('Konsep yang wajib dipahami','Required concepts'),bullets:A(m.k,m.k)},{title:R('Alur dari dokumen','Document flow'),paragraphs:[{text:R(m.f,m.f),refs:[sid]}]},{title:R('Fokus L2 dari dokumen','L2 focus from the document'),paragraphs:[{text:R(m.l,m.l),refs:[sid]}]}],sources:[sid,'IDIRA-PAM-ADMIN-BUNDLE'],related:m.r,readingTime:14,lastReviewed:'2026-08-15',appliesTo:['PAM Administration training material'],aliases:['CyberArk PAM Admin M'+m.n],_expanded:true});
   });
   data.entries.push({id:'idira-pam-admin-summary',category:'foundation',term:'Idira PAM Admin Training',title:R('Peta 20 Modul PAM Admin (Idira)','20-Module PAM Admin Map (Idira)'),what:R('Resource baru yang merangkum 20 PDF PAM Administration: konsep privileged account, user, policy, Safe, account lifecycle, workflow, discovery, PSM, PTA, report, architecture, backup, DR, security, monitoring, common issues, dan troubleshooting.','A new resource summarizing 20 PAM Administration PDFs: privileged accounts, users, policies, Safes, account lifecycle, workflows, discovery, PSM, PTA, reports, architecture, backup, DR, security, monitoring, common issues, and troubleshooting.'),simple:R('Ikuti M01-M20 secara berurutan; setiap artikel berisi summary, flow, L2 note, dan evidence.','Follow M01-M20 in order; every article contains a summary, flow, L2 note, and evidence.'),job:A(['M01-M04 fondasi; M05-M09 account lifecycle; M10-M13 session/threat/report; M14-M18 architecture/reliability; M19-M20 L2 operations.'],['M01-M04 foundations; M05-M09 account lifecycle; M10-M13 session/threat/report; M14-M18 architecture/reliability; M19-M20 L2 operations.']),flow:A(['Study → map component → match version docs → practice safely → document evidence.'],['Study → map components → match version docs → practice safely → document evidence.']),l2:A(['Gunakan Idira di UI; pahami CyberArk sebagai nama legacy yang masih muncul pada materi, component name, URL, dan docs.'],['Use Idira in the UI; understand CyberArk as a legacy name still present in training, component names, URLs, and docs.']),boundary:A(['Ringkasan belajar, bukan pengganti SOP atau official version-specific documentation.'],['Study summary, not a replacement for SOP or official version-specific documentation.']),sources:['IDIRA-PAM-ADMIN-BUNDLE'],related:ms.map(m=>'idira-pam-admin-m'+m.n),aliases:['CyberArk PAM Administration','PAM Admin training'],readingTime:18});
   course.guides.push({id:'idira-pam-admin-guide',group:'Study Guide',title:R('Idira PAM Admin - 20 Modul','Idira PAM Admin - 20 Modules'),trigger:R('Alur belajar resource training PAM Admin baru.','Study path for the new PAM Admin training resource.'),steps:R(['M01-M04: pahami fondasi, user, policy, Platform, dan Safe.','M05-M09: ikuti account lifecycle dari onboarding sampai dependent update.','M10-M13: pisahkan password flow, session flow, threat analytics, dan report.','M14-M18: buat topology, backup/restore plan, DR runbook, security baseline, monitoring matrix.','M19-M20: latihan timeline, evidence, RCA, dan escalation package.'],['M01-M04: learn foundations, users, policies, Platforms, and Safes.','M05-M09: follow account lifecycle from onboarding to dependent update.','M10-M13: separate password, session, threat-analytics, and report flows.','M14-M18: create topology, backup/restore plan, DR runbook, security baseline, and monitoring matrix.','M19-M20: practice timelines, evidence, RCA, and escalation packages.']),evidence:R('Component map, permission matrix, account lifecycle, session flow, DR checklist, monitoring matrix, dan escalation package.','Component map, permission matrix, account lifecycle, session flow, DR checklist, monitoring matrix, and escalation package.'),avoid:R('Menghafal menu tanpa memahami object, dependency, version, scope, dan evidence.','Memorizing menus without understanding objects, dependencies, version, scope, and evidence.')});
+
+  if (!course.parts.some(p => p.id === 'p7')) {
+    course.parts.push({
+      id: 'p7', order: 7,
+      title: R('Training PAM Admin (Idira)', 'PAM Admin Training (Idira)'),
+      desc: R('20 Modul pendamping eksklusif untuk dipelajari dari materi PDF.', '20 exclusive companion modules to study from the PDF material.')
+    });
+    ms.forEach((m, idx) => {
+      course.modules['idira_m' + m.n] = {
+        id: 'idira_m' + m.n,
+        title: 'M' + m.n + ' - ' + m.t,
+        en: 'M' + m.n + ' - ' + m.t,
+        phase: '7. Training PAM Admin',
+        phaseEn: '7. Idira PAM Admin',
+        lead: m.s,
+        leadEn: m.s,
+        part: 'p7',
+        order: 14 + idx + 1,
+        duration: 15,
+        level: 'core',
+        tags: ['idira', 'pam', 'admin', 'm' + m.n],
+        objId: ['Buka "Library" lalu ketik "M' + m.n + '"', 'Pahami failure modes', 'Catat evidence minimum'],
+        objEn: ['Open "Library" and type "M' + m.n + '"', 'Understand failure modes', 'Record minimum evidence'],
+        
+        contentId: '<div class="lesson-block"><h2>' + m.t + '</h2><p>Materi Idira (formerly CyberArk) PAM Administrator disusun dalam urutan konsep hingga penerapan L2 troubleshooting.</p><h3>Penjelasan Dasar (Summary)</h3><p>'+m.s+'</p><h3>Alur Inti (Flow)</h3><p>'+m.f+'</p><h3>Panduan Investigasi L2</h3><p>'+m.l+'</p><p>Baca dokumen PDF asli (<code>'+(m.n)+'-*.pdf</code>) secara offline pada folder MATERIAL TRAINING.</p><div class="callout safe"><strong>Atlas Referensi Lengkap</strong>: Modul ini memiliki catatan <em>failure modes</em>, <em>mental model</em>, dan <em>evidence checklist</em> di Library. Cari topik <code>Idira PAM Admin M'+m.n+'</code> untuk review mendalam.</div></div>',
+
+        
+        contentEn: '<div class="lesson-block"><h2>' + m.t + '</h2><p>The Idira (formerly CyberArk) PAM Administrator material is arranged from concepts to L2 troubleshooting.</p><h3>Basic Explanation (Summary)</h3><p>'+m.s+'</p><h3>Core Flow</h3><p>'+m.f+'</p><h3>L2 Investigation Guide</h3><p>'+m.l+'</p><p>Read the original PDF document (<code>'+(m.n)+'-*.pdf</code>) offline in the MATERIAL TRAINING folder.</p><div class="callout safe"><strong>Complete Reference Atlas</strong>: This module has <em>failure modes</em>, <em>mental models</em>, and <em>evidence checklists</em> in the Library. Search for the topic <code>Idira PAM Admin M'+m.n+'</code> for in-depth review.</div></div>',
+
+        exercise: {
+          brief: R('Buat rangkuman mental model.', 'Write a mental model summary.'),
+          deliverables: R(['Apa flow intinya?', 'Bagaimana ini memengaruhi komponen lain?', 'Log apa yang harus dilihat?'], ['What is the core flow?', 'How does this affect other components?', 'Which logs should be checked?']),
+          safety: R('Jangan menyalin PDF berlisensi ke dalam note.', 'Do not copy licensed PDFs into the notes.')
+        }
+      };
+    });
+  }
+
 })();

@@ -8,12 +8,12 @@
   addSource('CA-PAM-BRIEF','CyberArk Privileged Access Manager Solution Brief','CyberArk','Primary','https://www.cyberark.com/resources/product-datasheets/cyberark-privileged-access-security-solution');
   data.entries.forEach(e=>{
     const p=profiles[e.id]||{};
-    const refs=p.refs||fallback[e.category]||['CA-DOCS-15.2','LOCAL-RICKO'];
-    e.readingTime=p.time||18;
-    e.lastReviewed=data.lastReviewed||'2026-08-04';
+    const refs=(e.sources&&e.sources.length)?e.sources:(p.refs||fallback[e.category]||['CA-DOCS-15.2','LOCAL-RICKO']);
+    e.readingTime=e.readingTime||p.time||18;
+    e.lastReviewed=e.lastReviewed||data.lastReviewed||'2026-08-04';
     e.appliesTo=e.appliesTo||['Check product edition and version'];
     e.versionNote=e.versionNote||R('Detail menu, path, port, log, dan behavior harus diverifikasi terhadap edition, build, topology, serta SOP customer.','Menus, paths, ports, logs, and behavior must be verified against the edition, build, topology, and customer SOP.');
-    e.sections=p.sections||[
+    e.sections=p.sections||e.sections||[
       {title:R('Penjelasan dari dasar','First-principles explanation'),paragraphs:[{text:R(`${e.what.id} Mulai dengan membedakan tujuan, object, flow, dependency, dan boundary. Jangan melompat langsung ke prosedur; pahami dulu apa yang harus dilindungi dan siapa yang memiliki tanggung jawab.`,`${e.what.en} Start by separating purpose, objects, flows, dependencies, and boundaries. Do not jump directly to procedures; first understand what must be protected and who owns each responsibility.`),refs}]},
       {title:R('Mental model sederhana','Simple mental model'),paragraphs:[{text:R(`${e.simple.id} Gunakan analogi ini untuk mengingat konsep, lalu kembali ke istilah teknis ketika membaca ticket atau dokumentasi version.`,`${e.simple.en} Use this analogy to remember the concept, then return to the technical terms when reading a ticket or version-specific documentation.`),refs}]},
       {title:R('Flow dan dependency','Flow and dependencies'),paragraphs:[{text:R((e.flow.id||[]).join(' '),(e.flow.en||[]).join(' ')),refs}]},

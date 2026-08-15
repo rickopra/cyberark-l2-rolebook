@@ -1,7 +1,7 @@
 (() => {
   let query = '';
 
-  const text = value => String(value ?? '');
+  const text = value => String(value ? '');
   const escapeHtml = value => text(value).replace(/[&<>"']/g, character => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[character]));
   const language = () => document.documentElement.lang === 'en' ? 'en' : 'id';
   const index = () => window.CYBERARK_DOCS_INDEX;
