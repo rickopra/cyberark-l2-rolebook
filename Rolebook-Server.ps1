@@ -71,8 +71,11 @@ $Static=@{
   '/rolebook-assets/reference-deep-architecture.js'='rolebook-assets\reference-deep-architecture.js'
   '/rolebook-assets/reference-finalize.js'='rolebook-assets\reference-finalize.js'
   '/rolebook-assets/reference-expansion.js'='rolebook-assets\reference-expansion.js'
+  '/rolebook-assets/reference-docs-atlas.js'='rolebook-assets\reference-docs-atlas.js'
+  '/rolebook-assets/cyberark-docs-index.js'='rolebook-assets\cyberark-docs-index.js'
   '/rolebook-assets/rolebook-library-helpers.js'='rolebook-assets\rolebook-library-helpers.js'
   '/rolebook-assets/inject-cyberbrainer.js'='rolebook-assets\inject-cyberbrainer.js'
+  '/rolebook-assets/inject-idira-training.js'='rolebook-assets\inject-idira-training.js'
   '/CyberArk_L2_Support_Engineer_Rolebook_Ricko(1).docx'='CyberArk_L2_Support_Engineer_Rolebook_Ricko(1).docx'
 }
 Open-Rolebook $Port

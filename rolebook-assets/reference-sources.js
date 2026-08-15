@@ -2,7 +2,7 @@
   const data = window.REFERENCE_DATA;
   if (!data) return;
   data.lastReviewed = '2026-08-04';
-  data.sources = [{id:'CYBERBRAINER-10V',title:'CyberBrainer CyberArk Tutorial Videos for Beginners (Playlist of 10 Videos)',publisher:'CyberBrainer',type:'Supplemental',url:'https://www.youtube.com/playlist?list=PLVNl9sThbR3G-W-wI0ik7gMHrcMypBraN',accessed:'2026-08-11'},
+  data.sources = [{id:"LOCAL-RICKO",title:"Customer Specific L2 Runbook",publisher:"Internal",type:"Customer SOP",url:"#",accessed:"2026-08-15"},{id:'CYBERBRAINER-10V',title:'CyberBrainer CyberArk Tutorial Videos for Beginners (Playlist of 10 Videos)',publisher:'CyberBrainer',type:'Supplemental',url:'https://www.youtube.com/playlist?list=PLVNl9sThbR3G-W-wI0ik7gMHrcMypBraN',accessed:'2026-08-11'},
     {id:'CA-DOCS-15.2',title:'CyberArk PAM Self-Hosted Documentation ? 15.2',publisher:'CyberArk',type:'Primary',url:'https://docs.cyberark.com/pam-self-hosted/latest/en/Content/Resources/_TopNav/cc_Home.htm',accessed:'2026-08-04'},
     {id:'CA-INSTALL-15.2',title:'PAM Installation Overview and Requirements',publisher:'CyberArk',type:'Primary',url:'https://docs.cyberark.com/pam-self-hosted/latest/en/Content/PAS%20INST/InstallationOverview.htm',accessed:'2026-08-04'},
     {id:'CA-REST-15.2',title:'Implement Privileged Account Security REST APIs',publisher:'CyberArk',type:'Primary',url:'https://docs.cyberark.com/pam-self-hosted/latest/en/Content/WebServices/Implementing%20Privileged%20Account%20Security%20Web%20Services%20.htm',accessed:'2026-08-04'},
