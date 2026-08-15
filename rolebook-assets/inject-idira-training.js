@@ -33,9 +33,9 @@
   data.entries.push({id:'idira-pam-admin-summary',category:'foundation',term:'Idira PAM Admin Training',title:R('Peta 20 Modul PAM Admin (Idira)','20-Module PAM Admin Map (Idira)'),what:R('Resource baru yang merangkum 20 PDF PAM Administration: konsep privileged account, user, policy, Safe, account lifecycle, workflow, discovery, PSM, PTA, report, architecture, backup, DR, security, monitoring, common issues, dan troubleshooting.','A new resource summarizing 20 PAM Administration PDFs: privileged accounts, users, policies, Safes, account lifecycle, workflows, discovery, PSM, PTA, reports, architecture, backup, DR, security, monitoring, common issues, and troubleshooting.'),simple:R('Ikuti M01-M20 secara berurutan; setiap artikel berisi summary, flow, L2 note, dan evidence.','Follow M01-M20 in order; every article contains a summary, flow, L2 note, and evidence.'),job:A(['M01-M04 fondasi; M05-M09 account lifecycle; M10-M13 session/threat/report; M14-M18 architecture/reliability; M19-M20 L2 operations.'],['M01-M04 foundations; M05-M09 account lifecycle; M10-M13 session/threat/report; M14-M18 architecture/reliability; M19-M20 L2 operations.']),flow:A(['Study → map component → match version docs → practice safely → document evidence.'],['Study → map components → match version docs → practice safely → document evidence.']),l2:A(['Gunakan Idira di UI; pahami CyberArk sebagai nama legacy yang masih muncul pada materi, component name, URL, dan docs.'],['Use Idira in the UI; understand CyberArk as a legacy name still present in training, component names, URLs, and docs.']),boundary:A(['Ringkasan belajar, bukan pengganti SOP atau official version-specific documentation.'],['Study summary, not a replacement for SOP or official version-specific documentation.']),sources:['IDIRA-PAM-ADMIN-BUNDLE'],related:ms.map(m=>'idira-pam-admin-m'+m.n),aliases:['CyberArk PAM Administration','PAM Admin training'],readingTime:18});
   course.guides.push({id:'idira-pam-admin-guide',group:'Study Guide',title:R('Idira PAM Admin - 20 Modul','Idira PAM Admin - 20 Modules'),trigger:R('Alur belajar resource training PAM Admin baru.','Study path for the new PAM Admin training resource.'),steps:R(['M01-M04: pahami fondasi, user, policy, Platform, dan Safe.','M05-M09: ikuti account lifecycle dari onboarding sampai dependent update.','M10-M13: pisahkan password flow, session flow, threat analytics, dan report.','M14-M18: buat topology, backup/restore plan, DR runbook, security baseline, monitoring matrix.','M19-M20: latihan timeline, evidence, RCA, dan escalation package.'],['M01-M04: learn foundations, users, policies, Platforms, and Safes.','M05-M09: follow account lifecycle from onboarding to dependent update.','M10-M13: separate password, session, threat-analytics, and report flows.','M14-M18: create topology, backup/restore plan, DR runbook, security baseline, and monitoring matrix.','M19-M20: practice timelines, evidence, RCA, and escalation packages.']),evidence:R('Component map, permission matrix, account lifecycle, session flow, DR checklist, monitoring matrix, dan escalation package.','Component map, permission matrix, account lifecycle, session flow, DR checklist, monitoring matrix, and escalation package.'),avoid:R('Menghafal menu tanpa memahami object, dependency, version, scope, dan evidence.','Memorizing menus without understanding objects, dependencies, version, scope, and evidence.')});
 
-  if (!course.parts.some(p => p.id === 'p7')) {
+  if (!course.parts.some(p => p.id === 'p8')) {
     course.parts.push({
-      id: 'p7', order: 7,
+      id: 'p8', order: 8,
       title: R('Training PAM Admin (Idira)', 'PAM Admin Training (Idira)'),
       desc: R('20 Modul pendamping eksklusif untuk dipelajari dari materi PDF.', '20 exclusive companion modules to study from the PDF material.')
     });
@@ -44,12 +44,12 @@
         id: 'idira_m' + m.n,
         title: 'M' + m.n + ' - ' + m.t,
         en: 'M' + m.n + ' - ' + m.t,
-        phase: '7. Training PAM Admin',
-        phaseEn: '7. Idira PAM Admin',
+        phase: '8. Training PAM Admin',
+        phaseEn: '8. Idira PAM Admin',
         lead: m.s,
         leadEn: m.s,
-        part: 'p7',
-        order: 14 + idx + 1,
+        part: 'p8',
+        order: 15 + idx + 1,
         duration: 15,
         level: 'core',
         tags: ['idira', 'pam', 'admin', 'm' + m.n],
