@@ -88,3 +88,7 @@
 
 .brand-logo{width:26px;height:26px;flex:0 0 auto;display:block}.brand-mark span{display:inline-block}
 .nav-icon svg{display:block;width:20px;height:20px}
+.welcome-gate{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;background:color-mix(in srgb,var(--surface2) 90%,transparent);backdrop-filter:blur(8px)}
+.welcome-card{width:min(580px,100%);background:var(--surface);border:1px solid var(--line);border-radius:16px;box-shadow:0 18px 60px rgba(20,35,59,.2);padding:32px 36px;animation:fade .25s ease both}
+.welcome-card h2{margin:0;font-size:clamp(1.5rem,3vw,2rem);letter-spacing:-.04em}.welcome-card p{line-height:1.65}.welcome-card .version-warning{border-left:4px solid #eab308;padding:14px 16px;background:rgba(234,179,8,.08);border-radius:8px}
+@media(max-width:560px){.welcome-card{padding:25px 20px}.welcome-card h2{font-size:1.4rem}}
