@@ -2,7 +2,41 @@
   const course=window.COURSE_DATA,data=window.REFERENCE_DATA;
   if(!course||!data||data.sources.some(s=>s.id==='IDIRA-PAM-ADMIN-BUNDLE'))return;
   const R=(id,en)=>({id,en}),A=(id,en)=>({id,en});
-  data.sources.push({id:'IDIRA-PAM-ADMIN-BUNDLE',title:'Idira (formerly CyberArk) PAM Admin Training (20 Modules)',publisher:'Idira / CyberArk',type:'Primary Training',url:'https://docs.cyberark.com/',accessed:'2026-08-15',note:'PDF asli tetap lokal; rolebook memuat ringkasan/parafrasa.'});
+  const E=value=>String(value??'').replace(/[&<>"']/g,char=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[char]));
+  const list=(items,className='')=>items?.length?`<ul class="${className}">${items.map(item=>`<li>${E(item)}</li>`).join('')}</ul>`:'';
+  const table=definition=>definition?.rows?.length?`<div class="training-table-wrap"><table class="training-table"><thead><tr>${definition.headers.map(item=>`<th>${E(item)}</th>`).join('')}</tr></thead><tbody>${definition.rows.map(row=>`<tr>${row.map(item=>`<td>${E(item)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`:'';
+  const callout=definition=>definition?`<aside class="training-callout ${E(definition.tone||'concept')}"><strong>${E(definition.title)}</strong><p>${E(definition.text)}</p></aside>`:'';
+  const sectionHtml=(section,moduleNumber,index)=>`<section class="training-section" id="training-${moduleNumber}-section-${index+1}"><div class="training-section-head"><div><span class="training-section-number">${String(index+1).padStart(2,'0')}</span><h3>${E(section.title)}</h3></div>${section.pages?`<span class="training-source-pages">Jejak sumber: ${E(section.pages)}</span>`:''}</div>${(section.paragraphs||[]).map(text=>`<p>${E(text)}</p>`).join('')}${list(section.bullets)}${section.flowNote?`<div class="training-flow-note"><strong>Flow ringkas</strong><span>${E(section.flowNote)}</span></div>`:''}${table(section.table)}${callout(section.callout)}</section>`;
+  const detailPanel=(title,items,kind='')=>items?.length?`<section class="training-detail-panel ${kind}"><h3>${E(title)}</h3>${list(items,'training-check-list')}</section>`:'';
+
+  const renderChapter=(moduleNumber,module,chapter,detail)=>{
+    const toc=(chapter.sections||[]).map((section,index)=>`<a href="#training-${moduleNumber}-section-${index+1}"><span>${String(index+1).padStart(2,'0')}</span>${E(section.title.replace(/^\d+\.\s*/,''))}</a>`).join('');
+    const terms=chapter.terms?.length?`<section class="training-section training-terms"><div class="training-section-head"><div><span class="training-section-number">00</span><h3>Istilah yang harus dikuasai</h3></div></div><div class="training-term-grid">${chapter.terms.map(([term,meaning])=>`<article><strong>${E(term)}</strong><p>${E(meaning)}</p></article>`).join('')}</div></section>`:'';
+    const scenario=chapter.scenario?`<section class="training-scenario"><div class="eyebrow">SCENARIO WALKTHROUGH</div><h3>${E(chapter.scenario.title)}</h3><p>${E(chapter.scenario.situation)}</p><ol>${chapter.scenario.walkthrough.map(step=>`<li>${E(step)}</li>`).join('')}</ol><div class="training-scenario-result"><strong>Kesimpulan yang diharapkan</strong><p>${E(chapter.scenario.result)}</p></div></section>`:'';
+    const checks=chapter.checks?.length?`<section class="training-knowledge"><div class="eyebrow">KNOWLEDGE CHECK + JAWABAN</div><h3>Uji pemahaman, lalu buka penjelasannya</h3>${chapter.checks.map((item,index)=>`<details><summary><span>Q${index+1}</span>${E(item.question)}</summary><p><strong>Jawaban:</strong> ${E(item.answer)}</p></details>`).join('')}</section>`:'';
+    const detailGroups=[
+      detailPanel('Konsep inti dari materi',detail?.concepts,'concepts'),
+      detailPanel('Alur komponen',detail?.flow,'flow'),
+      detailPanel('Tugas administrator',detail?.admin,'admin'),
+      detailPanel('Walkthrough investigasi L2',detail?.l2,'l2'),
+      detailPanel('Evidence minimum',detail?.evidence,'evidence'),
+      detailPanel('Kesalahan umum yang harus dihindari',detail?.pitfalls,'pitfalls'),
+      detailPanel('Latihan mandiri',detail?.exercises,'exercises')
+    ].join('');
+    return `<article class="training-chapter" id="training-${moduleNumber}"><header class="training-hero"><div class="eyebrow">IDIRA (FORMERLY CYBERARK) · PAM ADMIN M${moduleNumber}</div><h2>${E(chapter.title)}</h2><p class="training-subtitle">${E(chapter.subtitle)}</p><div class="training-provenance"><strong>Bab mandiri Rolebook</strong><span>${E(chapter.source)}</span><span>Sumber faktual hanya modul training terkait; seluruh makna, fungsi, alur, dan ekspansi operasional dijelaskan di halaman ini tanpa perlu membuka slide atau PDF.</span></div></header><div class="training-intro">${chapter.intro.map(text=>`<p>${E(text)}</p>`).join('')}</div><aside class="training-mental"><span>MENTAL MODEL</span><p>${E(chapter.mentalModel)}</p></aside><div class="training-objectives"><h3>Setelah bab ini kamu dapat</h3>${list(chapter.objectives,'training-check-list')}</div><nav class="training-toc" aria-label="Daftar isi bab"><strong>Daftar isi bab</strong>${toc}</nav>${terms}${chapter.sections.map((section,index)=>sectionHtml(section,moduleNumber,index)).join('')}${chapter.decisionTable?`<section class="training-section training-decisions"><div class="training-section-head"><div><span class="training-section-number">↳</span><h3>Tabel keputusan dan dampak operasional</h3></div></div>${table(chapter.decisionTable)}</section>`:''}<section class="training-operational"><div class="eyebrow">OPERATIONAL EXPANSION</div><h3>Dari konsep menjadi pekerjaan administrator dan L2</h3><div class="training-detail-grid">${detailGroups}</div></section>${scenario}${checks}<section class="training-summary"><div><h3>Ringkasan bab</h3>${list(chapter.summary)}</div><div><h3>Batas aman dan catatan versi</h3>${list(chapter.boundaries)}</div></section><footer class="training-footer-note"><strong>Made by Ricko Prayudha · Offline Learning Workspace</strong><span>Materi belajar independen dan tidak berafiliasi dengan IDIRA, CyberArk, Palo Alto Networks, atau pemilik produk terkait.</span></footer></article>`;
+  };
+
+  const chapterReferenceSections=(chapter,detail,sourceId)=>{
+    const section=(title,paragraphs=[],bullets=[])=>({title:R(title,title),paragraphs:paragraphs.map(text=>({text:R(text,text),refs:[sourceId]})),bullets:A(bullets,bullets)});
+    const sections=[section('Pengantar bab',chapter.intro),section('Mental model',[chapter.mentalModel]),section('Istilah penting',[],chapter.terms.map(([term,meaning])=>`${term}: ${meaning}`))];
+    chapter.sections.forEach(item=>sections.push(section(item.title,item.paragraphs||[],[...(item.bullets||[]),...(item.table?.rows||[]).map(row=>row.join(' — ')),...(item.callout?[`${item.callout.title}: ${item.callout.text}`]:[])])));
+    if(chapter.decisionTable)sections.push(section('Tabel keputusan dan dampak',[],chapter.decisionTable.rows.map(row=>row.join(' — '))));
+    if(detail){sections.push(section('Tugas administrator',[],detail.admin),section('Investigasi L2',[],detail.l2),section('Evidence minimum',[],detail.evidence),section('Kesalahan umum',[],detail.pitfalls),section('Latihan mandiri',[],detail.exercises));}
+    if(chapter.scenario)sections.push(section(`Skenario: ${chapter.scenario.title}`,[chapter.scenario.situation,chapter.scenario.result],chapter.scenario.walkthrough));
+    sections.push(section('Knowledge check dengan jawaban',[],chapter.checks.map(item=>`Pertanyaan: ${item.question} Jawaban: ${item.answer}`)),section('Ringkasan',[],chapter.summary),section('Batas aman dan catatan versi',[],chapter.boundaries));
+    return sections;
+  };
+  data.sources.push({id:'IDIRA-PAM-ADMIN-BUNDLE',title:'IDIRA (formerly CyberArk) PAM Administrator — 20 Complete Chapters',publisher:'IDIRA / CyberArk training source',type:'Primary Training',url:'https://docs.cyberark.com/',accessed:'2026-08-15',note:'Dua puluh dokumen training lokal menjadi sumber faktual; seluruh materi belajar sudah ditulis ulang, dijelaskan, dan diperluas langsung di Rolebook.'});
   const ms=[
     {n:'01',c:'foundation',t:'Introduction to PAM',s:'Konsep privileged account, ancaman credential, manfaat PAM, arsitektur self-hosted, session isolation, dan mitigasi lateral movement.',f:'Identity → authentication → Vault authorization → CPM credential flow atau PSM session flow → target access → recording & audit.',l:'Mulai dari aktivitas yang gagal: portal login, request workflow, connection, atau rotation. Catat edition/build, topology, dan timestamp.',k:['Bedakan identity, user, account, credential.','PAM bukan hanya password vault; ia menggabungkan authorization, lifecycle, isolation, recording, detection, dan audit.'],r:['pam','vault','pvwa','cpm','psm']},
     {n:'02',c:'component',t:'User Management',s:'User vs Account, internal dan transparent users/groups, predefined identities, PrivateArk/PVWA administration, Vault/Safe authorization, PVWA permission, dan LDAP directory mapping.',f:'Authentication → directory mapping (LDAP) → internal user mapping → Vault role → Safe membership → PVWA permissions & action.',l:'Jika login sukses tetapi account tidak terlihat, masalahnya ada di directory mapping, Safe membership, atau Safe permission scope.',k:['User adalah requester; Account adalah object credential pada target.','Pisahkan Vault authorization, Safe permission, dan PVWA permission.'],r:['rbac','safe','pvwa']},
@@ -27,18 +61,18 @@
   ];
   ms.forEach(m=>{
     const sid='IDIRA-PAM-ADMIN-M'+m.n;
-    data.sources.push({id:sid,title:'PAM Administration M'+m.n+' - '+m.t,publisher:'Idira / CyberArk legacy training',type:'Training PDF (local)',url:'https://docs.cyberark.com/',accessed:'2026-08-15',note:'File lokal: MATERIAL TRAINING/MATERIAL TRAINING'});
-    data.entries.push({id:'idira-pam-admin-m'+m.n,category:m.c,term:'Idira PAM Admin M'+m.n+': '+m.t,title:R('M'+m.n+' - '+m.t,'M'+m.n+' - '+m.t),what:R(m.s,m.s),simple:R('Sub-modul belajar administrator PAM.','PAM administrator study sub-module.'),job:A(m.k,m.k),flow:A([m.f],[m.f]),l2:A([m.l],[m.l]),boundary:A(['Ringkasan/parafrasa ini hanya mengambil pokok materi PDF training terkait.'],['This summary/paraphrase only uses the related training PDF.']),failureModes:A([m.l],[m.l]),evidence:A(['Flow: '+m.f,'Catatan L2: '+m.l,'Dokumen sumber: M'+m.n+' - '+m.t],['Flow: '+m.f,'L2 note: '+m.l,'Source document: M'+m.n+' - '+m.t]),sections:[{title:R('Ringkasan modul','Module summary'),paragraphs:[{text:R(m.s,m.s),refs:[sid]}]},{title:R('Konsep yang wajib dipahami','Required concepts'),bullets:A(m.k,m.k)},{title:R('Alur dari dokumen','Document flow'),paragraphs:[{text:R(m.f,m.f),refs:[sid]}]},{title:R('Fokus L2 dari dokumen','L2 focus from the document'),paragraphs:[{text:R(m.l,m.l),refs:[sid]}]}],sources:[sid,'IDIRA-PAM-ADMIN-BUNDLE'],related:m.r,readingTime:14,lastReviewed:'2026-08-15',appliesTo:['PAM Administration training material'],aliases:['CyberArk PAM Admin M'+m.n],_expanded:true});
+    data.sources.push({id:sid,title:'PAM Administration M'+m.n+' - '+m.t,publisher:'IDIRA / CyberArk legacy training',type:'Training PDF (local)',url:'https://docs.cyberark.com/',accessed:'2026-08-15',note:'File lokal: MATERIAL TRAINING/MATERIAL TRAINING'});
+    data.entries.push({id:'idira-pam-admin-m'+m.n,category:m.c,term:'Idira PAM Admin M'+m.n+': '+m.t,title:R('M'+m.n+' - '+m.t,'M'+m.n+' - '+m.t),what:R(m.s,m.s),simple:R('Sub-modul belajar administrator PAM.','PAM administrator study sub-module.'),job:A(m.k,m.k),flow:A([m.f],[m.f]),l2:A([m.l],[m.l]),boundary:A(['Bab Rolebook ini menjelaskan konsep, fungsi, alur, dan implikasi operasional dari modul training terkait.'],['This summary/paraphrase only uses the related training PDF.']),failureModes:A([m.l],[m.l]),evidence:A(['Flow: '+m.f,'Catatan L2: '+m.l,'Dokumen sumber: M'+m.n+' - '+m.t],['Flow: '+m.f,'L2 note: '+m.l,'Source document: M'+m.n+' - '+m.t]),sections:[{title:R('Ringkasan modul','Module summary'),paragraphs:[{text:R(m.s,m.s),refs:[sid]}]},{title:R('Konsep yang wajib dipahami','Required concepts'),bullets:A(m.k,m.k)},{title:R('Alur dari dokumen','Document flow'),paragraphs:[{text:R(m.f,m.f),refs:[sid]}]},{title:R('Fokus L2 dari dokumen','L2 focus from the document'),paragraphs:[{text:R(m.l,m.l),refs:[sid]}]}],sources:[sid,'IDIRA-PAM-ADMIN-BUNDLE'],related:m.r,readingTime:14,lastReviewed:'2026-08-15',appliesTo:['PAM Administration training material'],aliases:['CyberArk PAM Admin M'+m.n],_expanded:true});
   });
-  data.entries.push({id:'idira-pam-admin-summary',category:'foundation',term:'Idira PAM Admin Training',title:R('Peta 20 Modul PAM Admin (Idira)','20-Module PAM Admin Map (Idira)'),what:R('Resource baru yang merangkum 20 PDF PAM Administration: konsep privileged account, user, policy, Safe, account lifecycle, workflow, discovery, PSM, PTA, report, architecture, backup, DR, security, monitoring, common issues, dan troubleshooting.','A new resource summarizing 20 PAM Administration PDFs: privileged accounts, users, policies, Safes, account lifecycle, workflows, discovery, PSM, PTA, reports, architecture, backup, DR, security, monitoring, common issues, and troubleshooting.'),simple:R('Ikuti M01-M20 secara berurutan; setiap artikel berisi summary, flow, L2 note, dan evidence.','Follow M01-M20 in order; every article contains a summary, flow, L2 note, and evidence.'),job:A(['M01-M04 fondasi; M05-M09 account lifecycle; M10-M13 session/threat/report; M14-M18 architecture/reliability; M19-M20 L2 operations.'],['M01-M04 foundations; M05-M09 account lifecycle; M10-M13 session/threat/report; M14-M18 architecture/reliability; M19-M20 L2 operations.']),flow:A(['Study → map component → match version docs → practice safely → document evidence.'],['Study → map components → match version docs → practice safely → document evidence.']),l2:A(['Gunakan Idira di UI; pahami CyberArk sebagai nama legacy yang masih muncul pada materi, component name, URL, dan docs.'],['Use Idira in the UI; understand CyberArk as a legacy name still present in training, component names, URLs, and docs.']),boundary:A(['Ringkasan belajar, bukan pengganti SOP atau official version-specific documentation.'],['Study summary, not a replacement for SOP or official version-specific documentation.']),sources:['IDIRA-PAM-ADMIN-BUNDLE'],related:ms.map(m=>'idira-pam-admin-m'+m.n),aliases:['CyberArk PAM Administration','PAM Admin training'],readingTime:18});
+  data.entries.push({id:'idira-pam-admin-summary',category:'foundation',term:'Idira PAM Admin Training',title:R('Kurikulum Lengkap 20 Bab PAM Administrator (IDIRA)','Complete 20-Chapter PAM Administrator Curriculum (IDIRA)'),what:R('Kurikulum mandiri yang menjelaskan secara lengkap 20 modul PAM Administration: konsep privileged account, user, policy, Safe, account lifecycle, workflow, discovery, PSM, PTA, report, architecture, backup, DR, security, monitoring, common issues, dan troubleshooting.','A self-contained curriculum fully explaining 20 PAM Administration modules: privileged accounts, users, policies, Safes, account lifecycle, workflows, discovery, PSM, PTA, reports, architecture, backup, DR, security, monitoring, common issues, and troubleshooting.'),simple:R('Ikuti M01–M20 langsung di Rolebook; setiap bab memuat definisi, konteks, fungsi, alur, dampak, tugas administrator, investigasi L2, evidence, skenario, serta jawaban knowledge check.','Follow M01–M20 directly in the Rolebook; every chapter includes definitions, context, purpose, flows, impacts, administrator tasks, L2 investigation, evidence, scenarios, and explained knowledge checks.'),job:A(['M01-M04 fondasi; M05-M09 account lifecycle; M10-M13 session/threat/report; M14-M18 architecture/reliability; M19-M20 L2 operations.'],['M01-M04 foundations; M05-M09 account lifecycle; M10-M13 session/threat/report; M14-M18 architecture/reliability; M19-M20 L2 operations.']),flow:A(['Study → map component → match version docs → practice safely → document evidence.'],['Study → map components → match version docs → practice safely → document evidence.']),l2:A(['Gunakan Idira di UI; pahami CyberArk sebagai nama legacy yang masih muncul pada materi, component name, URL, dan docs.'],['Use Idira in the UI; understand CyberArk as a legacy name still present in training, component names, URLs, and docs.']),boundary:A(['Materi belajar mandiri ini menjelaskan sumber training secara menyeluruh, tetapi tindakan produksi tetap harus mengikuti SOP, change control, dan dokumentasi yang sesuai build customer.'],['This self-contained learning material explains the training source comprehensively, but production actions must still follow the customer SOP, change control, and build-specific documentation.']),sources:['IDIRA-PAM-ADMIN-BUNDLE'],related:ms.map(m=>'idira-pam-admin-m'+m.n),aliases:['CyberArk PAM Administration','PAM Admin training'],readingTime:18});
   course.guides.push({id:'idira-pam-admin-guide',group:'Study Guide',title:R('Idira PAM Admin - 20 Modul','Idira PAM Admin - 20 Modules'),trigger:R('Alur belajar resource training PAM Admin baru.','Study path for the new PAM Admin training resource.'),steps:R(['M01-M04: pahami fondasi, user, policy, Platform, dan Safe.','M05-M09: ikuti account lifecycle dari onboarding sampai dependent update.','M10-M13: pisahkan password flow, session flow, threat analytics, dan report.','M14-M18: buat topology, backup/restore plan, DR runbook, security baseline, monitoring matrix.','M19-M20: latihan timeline, evidence, RCA, dan escalation package.'],['M01-M04: learn foundations, users, policies, Platforms, and Safes.','M05-M09: follow account lifecycle from onboarding to dependent update.','M10-M13: separate password, session, threat-analytics, and report flows.','M14-M18: create topology, backup/restore plan, DR runbook, security baseline, and monitoring matrix.','M19-M20: practice timelines, evidence, RCA, and escalation packages.']),evidence:R('Component map, permission matrix, account lifecycle, session flow, DR checklist, monitoring matrix, dan escalation package.','Component map, permission matrix, account lifecycle, session flow, DR checklist, monitoring matrix, and escalation package.'),avoid:R('Menghafal menu tanpa memahami object, dependency, version, scope, dan evidence.','Memorizing menus without understanding objects, dependencies, version, scope, and evidence.')});
 
 
   if (!course.parts.some(p => p.id === 'p8')) {
     course.parts.push({
       id: 'p8', order: 8,
-      title: R('Training PAM Admin (Idira)', 'PAM Admin Training (Idira)'),
-      desc: R('20 Modul pendamping eksklusif untuk dipelajari dari materi PDF.', '20 exclusive companion modules to study from the PDF material.')
+      title: R('20 Bab PAM Administrator (IDIRA)', '20 PAM Administrator Chapters (IDIRA)'),
+      desc: R('20 bab mandiri lengkap: seluruh konsep, fungsi, flow, dampak konfigurasi, operasi administrator, investigasi L2, evidence, skenario, dan jawaban tersedia langsung di Rolebook.', '20 complete self-contained chapters with concepts, functions, flows, configuration impact, administrator operations, L2 investigation, evidence, scenarios, and answers directly in the Rolebook.')
     });
     ms.forEach((m, idx) => {
       course.modules['idira_m' + m.n] = {
@@ -50,17 +84,18 @@
         lead: m.s,
         leadEn: m.s,
         part: 'p8',
-        order: 15 + idx + 1,
+        order: 15 + idx,
+        code: 'PAM M' + m.n,
         duration: 15,
         level: 'core',
         tags: ['idira', 'pam', 'admin', 'm' + m.n],
         objId: ['Buka "Library" lalu ketik "M' + m.n + '"', 'Pahami failure modes', 'Catat evidence minimum'],
         objEn: ['Open "Library" and type "M' + m.n + '"', 'Understand failure modes', 'Record minimum evidence'],
 
-        contentId: '<div class="lesson-block"><h2>' + m.t + '</h2><p>Materi Idira (formerly CyberArk) PAM Administrator disusun dalam urutan konsep hingga penerapan L2 troubleshooting.</p><h3>Penjelasan Dasar (Summary)</h3><p>'+m.s+'</p><h3>Alur Inti (Flow)</h3><p>'+m.f+'</p><h3>Panduan Investigasi L2</h3><p>'+m.l+'</p><p>Baca dokumen PDF asli (<code>'+(m.n)+'-*.pdf</code>) secara offline pada folder MATERIAL TRAINING.</p><div class="callout safe"><strong>Atlas Referensi Lengkap</strong>: Modul ini memiliki catatan <em>failure modes</em>, <em>mental model</em>, dan <em>evidence checklist</em> di Library. Cari topik <code>Idira PAM Admin M'+m.n+'</code> untuk review mendalam.</div></div>',
+        contentId: '<div class="lesson-block"><h2>' + m.t + '</h2><p>Materi Idira (formerly CyberArk) PAM Administrator disusun dalam urutan konsep hingga penerapan L2 troubleshooting.</p><h3>Fondasi Konsep</h3><p>'+m.s+'</p><h3>Alur Inti (Flow)</h3><p>'+m.f+'</p><h3>Panduan Investigasi L2</h3><p>'+m.l+'</p><p>Bab lengkap dimuat langsung di Rolebook dan mencakup konsep, fungsi, alur, keputusan operasional, skenario, serta investigasi L2.</p><div class="callout safe"><strong>Atlas Referensi Lengkap</strong>: Modul ini memiliki catatan <em>failure modes</em>, <em>mental model</em>, dan <em>evidence checklist</em> di Library. Cari topik <code>Idira PAM Admin M'+m.n+'</code> untuk review mendalam.</div></div>',
 
 
-        contentEn: '<div class="lesson-block"><h2>' + m.t + '</h2><p>The Idira (formerly CyberArk) PAM Administrator material is arranged from concepts to L2 troubleshooting.</p><h3>Basic Explanation (Summary)</h3><p>'+m.s+'</p><h3>Core Flow</h3><p>'+m.f+'</p><h3>L2 Investigation Guide</h3><p>'+m.l+'</p><p>Read the original PDF document (<code>'+(m.n)+'-*.pdf</code>) offline in the MATERIAL TRAINING folder.</p><div class="callout safe"><strong>Complete Reference Atlas</strong>: This module has <em>failure modes</em>, <em>mental models</em>, and <em>evidence checklists</em> in the Library. Search for the topic <code>Idira PAM Admin M'+m.n+'</code> for in-depth review.</div></div>',
+        contentEn: '<div class="lesson-block"><h2>' + m.t + '</h2><p>The Idira (formerly CyberArk) PAM Administrator material is arranged from concepts to L2 troubleshooting.</p><h3>Conceptual Foundation</h3><p>'+m.s+'</p><h3>Core Flow</h3><p>'+m.f+'</p><h3>L2 Investigation Guide</h3><p>'+m.l+'</p><p>The complete chapter is loaded directly in the Rolebook and covers concepts, functions, flows, operational decisions, scenarios, and L2 investigation.</p><div class="callout safe"><strong>Complete Reference Atlas</strong>: This module has <em>failure modes</em>, <em>mental models</em>, and <em>evidence checklists</em> in the Library. Search for the topic <code>Idira PAM Admin M'+m.n+'</code> for in-depth review.</div></div>',
 
         exercise: {
           brief: R('Buat rangkuman mental model.', 'Write a mental model summary.'),
@@ -79,7 +114,7 @@
       const d = window.IDIRA_TRAINING_DETAILS[m.n];
       if (!d) return;
       const tId = '<div class="lesson-block"><h2>' + m.t + '</h2>' +
-        '<div class="callout"><strong>Pemetaan PDF:</strong> ' + d.pages + '</div>' +
+        '<div class="callout"><strong>Cakupan materi sumber:</strong> ' + d.pages + '</div>' +
         '<h3>Tujuan Pembelajaran</h3><ul>' + d.objectives.map(x=>'<li>'+x+'</li>').join('') + '</ul>' +
         '<h3>Konsep Inti</h3><ul>' + d.concepts.map(x=>'<li>'+x+'</li>').join('') + '</ul>' +
         '<h3>Alur Komponen (Flow)</h3><ul>' + d.flow.map(x=>'<li>'+x+'</li>').join('') + '</ul>' +
@@ -93,7 +128,7 @@
       const entry = data.entries.find(e => e.id === 'idira-pam-admin-m' + m.n);
       if (entry) {
         entry.sections = [
-          { title: R('Pemetaan PDF','PDF Map'), paragraphs: [ {text: R(d.pages, d.pages)} ] },
+          { title: R('Cakupan materi sumber','Source coverage'), paragraphs: [ {text: R(d.pages, d.pages)} ] },
           { title: R('Tujuan Belajar','Objectives'), bullets: A(d.objectives, d.objectives) },
           { title: R('Konsep Inti','Core Concepts'), bullets: A(d.concepts, d.concepts) },
           { title: R('Alur Komponen','Component Flow'), bullets: A(d.flow, d.flow) },
@@ -107,5 +142,58 @@
         course.modules['idira_m' + m.n].contentEn = tId; // Rolebook app will render mixed/ID
       }
     });
+  }
+
+  if (window.IDIRA_TRAINING_CHAPTERS) {
+    ms.forEach(m => {
+      const chapter = window.IDIRA_TRAINING_CHAPTERS[m.n];
+      if (!chapter) return;
+      const detail = window.IDIRA_TRAINING_DETAILS?.[m.n];
+      const sourceId = 'IDIRA-PAM-ADMIN-M' + m.n;
+      const chapterHtml = renderChapter(m.n, m, chapter, detail);
+      const module = course.modules['idira_m' + m.n];
+      if (module) {
+        module.title = 'M' + m.n + ' - ' + chapter.title;
+        module.en = module.title;
+        module.lead = chapter.subtitle;
+        module.leadEn = chapter.subtitle;
+        module.duration = chapter.readingTime;
+        module.objId = chapter.objectives;
+        module.objEn = chapter.objectives;
+        module.contentId = chapterHtml;
+        module.contentEn = chapterHtml;
+        module.exercise = {
+          brief: R(chapter.scenario?.title || 'Latihan pemahaman mandiri', chapter.scenario?.title || 'Self-study exercise'),
+          deliverables: R(detail?.exercises || chapter.summary, detail?.exercises || chapter.summary),
+          safety: R(chapter.boundaries.join(' '), chapter.boundaries.join(' '))
+        };
+      }
+      const entry = data.entries.find(item => item.id === 'idira-pam-admin-m' + m.n);
+      if (entry) {
+        entry.term = 'Idira PAM Admin M' + m.n + ': ' + chapter.title;
+        entry.title = R('M' + m.n + ' - ' + chapter.title, 'M' + m.n + ' - ' + chapter.title);
+        entry.what = R(chapter.intro[0], chapter.intro[0]);
+        entry.simple = R(chapter.mentalModel, chapter.mentalModel);
+        entry.job = A(detail?.admin || [], detail?.admin || []);
+        entry.flow = A(detail?.flow || [], detail?.flow || []);
+        entry.l2 = A(detail?.l2 || [], detail?.l2 || []);
+        entry.boundary = A(chapter.boundaries, chapter.boundaries);
+        entry.failureModes = A(detail?.pitfalls || [], detail?.pitfalls || []);
+        entry.evidence = A(detail?.evidence || [], detail?.evidence || []);
+        entry.sections = chapterReferenceSections(chapter, detail, sourceId);
+        entry.readingTime = chapter.readingTime;
+        entry.lastReviewed = '2026-08-17';
+        entry.appliesTo = ['PAM Administration training material (2023)', 'Self-contained Indonesian Rolebook chapter'];
+        entry.versionNote = R('Materi sumber menjelaskan konsep PAM Self-Hosted tahun 2023. Cocokkan menu, parameter, path, dan support matrix dengan build customer sebelum perubahan produksi.', 'The source describes 2023 PAM Self-Hosted concepts. Match menus, parameters, paths, and support matrix to the customer build before production changes.');
+        entry._expanded = true;
+      }
+    });
+    const summaryEntry = data.entries.find(item => item.id === 'idira-pam-admin-summary');
+    if (summaryEntry) {
+      summaryEntry.what = R('Kurikulum ini memuat 20 bab mandiri berbahasa Indonesia yang memperluas seluruh konsep utama dari 699 halaman materi training PAM Administrator.', 'This curriculum contains 20 self-contained Indonesian chapters expanding the core concepts from 699 pages of PAM Administrator training.');
+      summaryEntry.simple = R('Belajar langsung di Rolebook: definisi, fungsi, alur internal, dampak konfigurasi, workflow administrator, investigasi L2, evidence, skenario, dan jawaban knowledge check tersedia tanpa harus membuka slide.', 'Learn directly in the Rolebook without opening the slides.');
+      summaryEntry.readingTime = 35;
+      summaryEntry.lastReviewed = '2026-08-17';
+    }
   }
 })();
