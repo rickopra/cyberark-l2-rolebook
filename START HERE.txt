@@ -1,10 +1,12 @@
-﻿CYBERARK L2 ROLEBOOK — START HERE
+IDIRA L2 ROLEBOOK (FORMERLY CYBERARK) - START HERE
 
 1. Double-click "Open CyberArk Rolebook.vbs".
 2. Browser akan terbuka otomatis ke aplikasi lokal.
 3. Progress tersimpan otomatis di folder data\progress.json.
 4. Sebelum memindahkan folder ke laptop/PC lain, tutup browser lalu gunakan menu Progress & Backup > Export progress JSON sebagai backup tambahan.
 5. Copy seluruh folder ROLEBOOK CYBERARK ke endpoint baru. Jalankan kembali file VBS dari folder baru.
+6. Buka Curriculum M01-M20 untuk membaca seluruh material training langsung di Rolebook. Bagian SOURCE ADDENDUM berisi detail faktual; bagian ANALISIS & PENGEMBANGAN ROLEBOOK berisi penerapan dan brainstorming tambahan.
+7. Di Library, cari istilah teknis apa pun, misalnya RecPrvKey, AllowedSafes, PADR.ini, CreateCredFile.exe, atau ITATS004E, untuk membuka pembahasan lengkapnya.
 
 Fallback:
 - Jika VBS diblokir oleh endpoint policy, gunakan "Open CyberArk Rolebook.cmd".
@@ -13,4 +15,5 @@ Fallback:
 Safety:
 - Jangan menyimpan password, token, key, atau identifier customer sensitif pada notebook.
 - Prosedur Vault/DR, failover, recovery, reconcile, certificate, dan perubahan production harus mengikuti build aktual, approved change, serta SOP customer/vendor.
-PAM: Reference library is now the primary explainer.
+
+PAM: Curriculum dan Reference Library adalah penjelasan utama; tidak perlu kembali membaca PPT/PDF sumber.

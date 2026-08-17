@@ -75,12 +75,15 @@ $Static=@{
   '/rolebook-assets/cyberark-docs-index.js'='rolebook-assets\cyberark-docs-index.js'
   '/rolebook-assets/rolebook-library-helpers.js'='rolebook-assets\rolebook-library-helpers.js'
   '/rolebook-assets/inject-cyberbrainer.js'='rolebook-assets\inject-cyberbrainer.js'
+  '/rolebook-assets/idira-training-details.js'='rolebook-assets\idira-training-details.js'
+  '/rolebook-assets/idira-training-chapters.js'='rolebook-assets\idira-training-chapters.js'
+  '/rolebook-assets/idira-training-expansions.js'='rolebook-assets\idira-training-expansions.js'
   '/rolebook-assets/inject-idira-training.js'='rolebook-assets\inject-idira-training.js'
   '/rolebook-assets/docs-explorer.js'='rolebook-assets\docs-explorer.js'
   '/rolebook-assets/icon-idira-logo.svg'='rolebook-assets\icon-idira-logo.svg'
   '/CyberArk_L2_Support_Engineer_Rolebook_Ricko(1).docx'='CyberArk_L2_Support_Engineer_Rolebook_Ricko(1).docx'
 }
-Open-Rolebook $Port
+if(-not $NoBrowser){Open-Rolebook $Port}
 try{
   while($true){
     $client=$Listener.AcceptTcpClient()

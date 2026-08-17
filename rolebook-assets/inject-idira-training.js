@@ -8,9 +8,16 @@
   const callout=definition=>definition?`<aside class="training-callout ${E(definition.tone||'concept')}"><strong>${E(definition.title)}</strong><p>${E(definition.text)}</p></aside>`:'';
   const sectionHtml=(section,moduleNumber,index)=>`<section class="training-section" id="training-${moduleNumber}-section-${index+1}"><div class="training-section-head"><div><span class="training-section-number">${String(index+1).padStart(2,'0')}</span><h3>${E(section.title)}</h3></div>${section.pages?`<span class="training-source-pages">Jejak sumber: ${E(section.pages)}</span>`:''}</div>${(section.paragraphs||[]).map(text=>`<p>${E(text)}</p>`).join('')}${list(section.bullets)}${section.flowNote?`<div class="training-flow-note"><strong>Flow ringkas</strong><span>${E(section.flowNote)}</span></div>`:''}${table(section.table)}${callout(section.callout)}</section>`;
   const detailPanel=(title,items,kind='')=>items?.length?`<section class="training-detail-panel ${kind}"><h3>${E(title)}</h3>${list(items,'training-check-list')}</section>`:'';
+  const commandList=items=>items?.length?`<div class="training-command-list">${items.map(item=>`<div><code>${E(item.code)}</code><span>${E(item.meaning)}</span></div>`).join('')}</div>`:'';
+  const expansionCards=(items,kind)=>items?.length?`<div class="training-expansion-grid">${items.map(item=>`<article class="training-expansion-card ${kind}"><header><h4>${E(item.title)}</h4>${item.pages?`<span>${E(item.pages)}</span>`:''}</header>${(item.paragraphs||[]).map(text=>`<p>${E(text)}</p>`).join('')}${list(item.bullets,'training-check-list')}${commandList(item.commands)}${table(item.table)}</article>`).join('')}</div>`:'';
+  const renderExpansion=(moduleNumber,expansion)=>{
+    if(!expansion)return'';
+    const coverage=expansion.coverage?.length?table({headers:['Halaman','Topik sumber','Perlakuan di Rolebook'],rows:expansion.coverage.map(item=>[item.pages,item.topic,item.treatment])}):'';
+    return `<section class="training-source-audit" id="training-${moduleNumber}-source-audit"><div class="eyebrow">AUDIT SUMBER 699 HALAMAN</div><h3>Jejak cakupan dan detail teknis sumber</h3><p>${E(expansion.coverageNote)}</p>${coverage}</section><section class="training-source-addendum" id="training-${moduleNumber}-source-addendum"><div class="eyebrow">SOURCE ADDENDUM</div><h3>Detail slide yang sekarang ditulis eksplisit</h3><p class="training-expansion-disclaimer">Bagian ini adalah parafrasa faktual dari material training lokal. Nama parameter, file, object, limit, port, dan command dipertahankan agar dapat dipakai sebagai referensi belajar.</p>${expansionCards(expansion.sourceAddendum,'source')}</section><section class="training-rolebook-analysis" id="training-${moduleNumber}-analysis"><div class="eyebrow">ANALISIS &amp; PENGEMBANGAN ROLEBOOK</div><h3>Bukan kutipan literal slide: penerapan, implikasi, dan pengembangan</h3><p class="training-expansion-disclaimer">Bagian ini adalah analisis Rolebook yang diturunkan dari materi sumber. Gunakan untuk membangun cara berpikir desain, operasi, troubleshooting, automation, dan maturity—bukan sebagai klaim bahwa kalimatnya berasal dari slide.</p>${expansionCards(expansion.analysis,'analysis')}${detailPanel('Artefak belajar dan kerja yang bisa dibuat',expansion.artifacts,'artifacts')}</section>`;
+  };
 
-  const renderChapter=(moduleNumber,module,chapter,detail)=>{
-    const toc=(chapter.sections||[]).map((section,index)=>`<a href="#training-${moduleNumber}-section-${index+1}"><span>${String(index+1).padStart(2,'0')}</span>${E(section.title.replace(/^\d+\.\s*/,''))}</a>`).join('');
+  const renderChapter=(moduleNumber,module,chapter,detail,expansion)=>{
+    const toc=(chapter.sections||[]).map((section,index)=>`<a href="#training-${moduleNumber}-section-${index+1}"><span>${String(index+1).padStart(2,'0')}</span>${E(section.title.replace(/^\d+\.\s*/,''))}</a>`).join('')+(expansion?`<a href="#training-${moduleNumber}-source-audit"><span>A</span>Audit cakupan sumber</a><a href="#training-${moduleNumber}-source-addendum"><span>S</span>Addendum teknis sumber</a><a href="#training-${moduleNumber}-analysis"><span>R</span>Analisis &amp; pengembangan</a>`:'');
     const terms=chapter.terms?.length?`<section class="training-section training-terms"><div class="training-section-head"><div><span class="training-section-number">00</span><h3>Istilah yang harus dikuasai</h3></div></div><div class="training-term-grid">${chapter.terms.map(([term,meaning])=>`<article><strong>${E(term)}</strong><p>${E(meaning)}</p></article>`).join('')}</div></section>`:'';
     const scenario=chapter.scenario?`<section class="training-scenario"><div class="eyebrow">SCENARIO WALKTHROUGH</div><h3>${E(chapter.scenario.title)}</h3><p>${E(chapter.scenario.situation)}</p><ol>${chapter.scenario.walkthrough.map(step=>`<li>${E(step)}</li>`).join('')}</ol><div class="training-scenario-result"><strong>Kesimpulan yang diharapkan</strong><p>${E(chapter.scenario.result)}</p></div></section>`:'';
     const checks=chapter.checks?.length?`<section class="training-knowledge"><div class="eyebrow">KNOWLEDGE CHECK + JAWABAN</div><h3>Uji pemahaman, lalu buka penjelasannya</h3>${chapter.checks.map((item,index)=>`<details><summary><span>Q${index+1}</span>${E(item.question)}</summary><p><strong>Jawaban:</strong> ${E(item.answer)}</p></details>`).join('')}</section>`:'';
@@ -23,14 +30,20 @@
       detailPanel('Kesalahan umum yang harus dihindari',detail?.pitfalls,'pitfalls'),
       detailPanel('Latihan mandiri',detail?.exercises,'exercises')
     ].join('');
-    return `<article class="training-chapter" id="training-${moduleNumber}"><header class="training-hero"><div class="eyebrow">IDIRA (FORMERLY CYBERARK) · PAM ADMIN M${moduleNumber}</div><h2>${E(chapter.title)}</h2><p class="training-subtitle">${E(chapter.subtitle)}</p><div class="training-provenance"><strong>Bab mandiri Rolebook</strong><span>${E(chapter.source)}</span><span>Sumber faktual hanya modul training terkait; seluruh makna, fungsi, alur, dan ekspansi operasional dijelaskan di halaman ini tanpa perlu membuka slide atau PDF.</span></div></header><div class="training-intro">${chapter.intro.map(text=>`<p>${E(text)}</p>`).join('')}</div><aside class="training-mental"><span>MENTAL MODEL</span><p>${E(chapter.mentalModel)}</p></aside><div class="training-objectives"><h3>Setelah bab ini kamu dapat</h3>${list(chapter.objectives,'training-check-list')}</div><nav class="training-toc" aria-label="Daftar isi bab"><strong>Daftar isi bab</strong>${toc}</nav>${terms}${chapter.sections.map((section,index)=>sectionHtml(section,moduleNumber,index)).join('')}${chapter.decisionTable?`<section class="training-section training-decisions"><div class="training-section-head"><div><span class="training-section-number">↳</span><h3>Tabel keputusan dan dampak operasional</h3></div></div>${table(chapter.decisionTable)}</section>`:''}<section class="training-operational"><div class="eyebrow">OPERATIONAL EXPANSION</div><h3>Dari konsep menjadi pekerjaan administrator dan L2</h3><div class="training-detail-grid">${detailGroups}</div></section>${scenario}${checks}<section class="training-summary"><div><h3>Ringkasan bab</h3>${list(chapter.summary)}</div><div><h3>Batas aman dan catatan versi</h3>${list(chapter.boundaries)}</div></section><footer class="training-footer-note"><strong>Made by Ricko Prayudha · Offline Learning Workspace</strong><span>Materi belajar independen dan tidak berafiliasi dengan IDIRA, CyberArk, Palo Alto Networks, atau pemilik produk terkait.</span></footer></article>`;
+    return `<article class="training-chapter" id="training-${moduleNumber}"><header class="training-hero"><div class="eyebrow">IDIRA (FORMERLY CYBERARK) - PAM ADMIN M${moduleNumber}</div><h2>${E(chapter.title)}</h2><p class="training-subtitle">${E(chapter.subtitle)}</p><div class="training-provenance"><strong>Bab mandiri Rolebook</strong><span>${E(chapter.source)}</span><span>Sumber faktual hanya modul training terkait; seluruh makna, fungsi, alur, detail teknis, dan ekspansi operasional dijelaskan di halaman ini tanpa perlu membuka slide atau PDF.</span></div></header><div class="training-intro">${chapter.intro.map(text=>`<p>${E(text)}</p>`).join('')}</div><aside class="training-mental"><span>MENTAL MODEL</span><p>${E(chapter.mentalModel)}</p></aside><div class="training-objectives"><h3>Setelah bab ini kamu dapat</h3>${list(chapter.objectives,'training-check-list')}</div><nav class="training-toc" aria-label="Daftar isi bab"><strong>Daftar isi bab</strong>${toc}</nav>${terms}${chapter.sections.map((section,index)=>sectionHtml(section,moduleNumber,index)).join('')}${chapter.decisionTable?`<section class="training-section training-decisions"><div class="training-section-head"><div><span class="training-section-number">D</span><h3>Tabel keputusan dan dampak operasional</h3></div></div>${table(chapter.decisionTable)}</section>`:''}${renderExpansion(moduleNumber,expansion)}<section class="training-operational"><div class="eyebrow">OPERATIONAL EXPANSION</div><h3>Dari konsep menjadi pekerjaan administrator dan L2</h3><div class="training-detail-grid">${detailGroups}</div></section>${scenario}${checks}<section class="training-summary"><div><h3>Ringkasan bab</h3>${list(chapter.summary)}</div><div><h3>Batas aman dan catatan versi</h3>${list(chapter.boundaries)}</div></section><footer class="training-footer-note"><strong>Made by Ricko Prayudha - Offline Learning Workspace</strong><span>Materi belajar independen dan tidak berafiliasi dengan IDIRA, CyberArk, Palo Alto Networks, atau pemilik produk terkait.</span></footer></article>`;
   };
 
-  const chapterReferenceSections=(chapter,detail,sourceId)=>{
-    const section=(title,paragraphs=[],bullets=[])=>({title:R(title,title),paragraphs:paragraphs.map(text=>({text:R(text,text),refs:[sourceId]})),bullets:A(bullets,bullets)});
+  const chapterReferenceSections=(chapter,detail,sourceId,expansion)=>{
+    const section=(title,paragraphs=[],bullets=[],refs=[sourceId])=>({title:R(title,title),paragraphs:paragraphs.map(text=>({text:R(text,text),refs})),bullets:A(bullets,bullets)});
     const sections=[section('Pengantar bab',chapter.intro),section('Mental model',[chapter.mentalModel]),section('Istilah penting',[],chapter.terms.map(([term,meaning])=>`${term}: ${meaning}`))];
-    chapter.sections.forEach(item=>sections.push(section(item.title,item.paragraphs||[],[...(item.bullets||[]),...(item.table?.rows||[]).map(row=>row.join(' — ')),...(item.callout?[`${item.callout.title}: ${item.callout.text}`]:[])])));
-    if(chapter.decisionTable)sections.push(section('Tabel keputusan dan dampak',[],chapter.decisionTable.rows.map(row=>row.join(' — '))));
+    chapter.sections.forEach(item=>sections.push(section(item.title,item.paragraphs||[],[...(item.bullets||[]),...(item.table?.rows||[]).map(row=>row.join(' ? ')),...(item.callout?[`${item.callout.title}: ${item.callout.text}`]:[])])));
+    if(chapter.decisionTable)sections.push(section('Tabel keputusan dan dampak',[],chapter.decisionTable.rows.map(row=>row.join(' ? '))));
+    if(expansion){
+      sections.push(section('Audit cakupan material training',[expansion.coverageNote],expansion.coverage.map(item=>`${item.pages} ? ${item.topic}: ${item.treatment}`)));
+      expansion.sourceAddendum.forEach(item=>sections.push(section(`Addendum sumber ? ${item.title}`,item.paragraphs||[],[...(item.bullets||[]),...(item.commands||[]).map(command=>`${command.code} ? ${command.meaning}`),...(item.table?.rows||[]).map(row=>row.join(' ? '))])));
+      expansion.analysis.forEach(item=>sections.push(section(`Analisis & Pengembangan Rolebook ? ${item.title}`,item.paragraphs||[],item.bullets||[],[])));
+      sections.push(section('Artefak pengembangan yang disarankan',[],expansion.artifacts||[],[]));
+    }
     if(detail){sections.push(section('Tugas administrator',[],detail.admin),section('Investigasi L2',[],detail.l2),section('Evidence minimum',[],detail.evidence),section('Kesalahan umum',[],detail.pitfalls),section('Latihan mandiri',[],detail.exercises));}
     if(chapter.scenario)sections.push(section(`Skenario: ${chapter.scenario.title}`,[chapter.scenario.situation,chapter.scenario.result],chapter.scenario.walkthrough));
     sections.push(section('Knowledge check dengan jawaban',[],chapter.checks.map(item=>`Pertanyaan: ${item.question} Jawaban: ${item.answer}`)),section('Ringkasan',[],chapter.summary),section('Batas aman dan catatan versi',[],chapter.boundaries));
@@ -149,15 +162,16 @@
       const chapter = window.IDIRA_TRAINING_CHAPTERS[m.n];
       if (!chapter) return;
       const detail = window.IDIRA_TRAINING_DETAILS?.[m.n];
+      const expansion = window.IDIRA_TRAINING_EXPANSIONS?.[m.n];
       const sourceId = 'IDIRA-PAM-ADMIN-M' + m.n;
-      const chapterHtml = renderChapter(m.n, m, chapter, detail);
+      const chapterHtml = renderChapter(m.n, m, chapter, detail, expansion);
       const module = course.modules['idira_m' + m.n];
       if (module) {
         module.title = 'M' + m.n + ' - ' + chapter.title;
         module.en = module.title;
         module.lead = chapter.subtitle;
         module.leadEn = chapter.subtitle;
-        module.duration = chapter.readingTime;
+        module.duration = chapter.readingTime + (expansion?.extraReadingTime || 0);
         module.objId = chapter.objectives;
         module.objEn = chapter.objectives;
         module.contentId = chapterHtml;
@@ -180,19 +194,24 @@
         entry.boundary = A(chapter.boundaries, chapter.boundaries);
         entry.failureModes = A(detail?.pitfalls || [], detail?.pitfalls || []);
         entry.evidence = A(detail?.evidence || [], detail?.evidence || []);
-        entry.sections = chapterReferenceSections(chapter, detail, sourceId);
-        entry.readingTime = chapter.readingTime;
+        entry.sections = chapterReferenceSections(chapter, detail, sourceId, expansion);
+        entry.readingTime = chapter.readingTime + (expansion?.extraReadingTime || 0);
         entry.lastReviewed = '2026-08-17';
-        entry.appliesTo = ['PAM Administration training material (2023)', 'Self-contained Indonesian Rolebook chapter'];
+        entry.appliesTo = ['PAM Administration training material (2023)', '699-page source audit', 'Self-contained Indonesian Rolebook chapter'];
+        entry.aliases = [...new Set([...(entry.aliases || []),...(expansion?.keywords || [])])];
         entry.versionNote = R('Materi sumber menjelaskan konsep PAM Self-Hosted tahun 2023. Cocokkan menu, parameter, path, dan support matrix dengan build customer sebelum perubahan produksi.', 'The source describes 2023 PAM Self-Hosted concepts. Match menus, parameters, paths, and support matrix to the customer build before production changes.');
         entry._expanded = true;
       }
     });
     const summaryEntry = data.entries.find(item => item.id === 'idira-pam-admin-summary');
     if (summaryEntry) {
-      summaryEntry.what = R('Kurikulum ini memuat 20 bab mandiri berbahasa Indonesia yang memperluas seluruh konsep utama dari 699 halaman materi training PAM Administrator.', 'This curriculum contains 20 self-contained Indonesian chapters expanding the core concepts from 699 pages of PAM Administrator training.');
-      summaryEntry.simple = R('Belajar langsung di Rolebook: definisi, fungsi, alur internal, dampak konfigurasi, workflow administrator, investigasi L2, evidence, skenario, dan jawaban knowledge check tersedia tanpa harus membuka slide.', 'Learn directly in the Rolebook without opening the slides.');
-      summaryEntry.readingTime = 35;
+      summaryEntry.what = R('Kurikulum ini memuat 20 bab mandiri berbahasa Indonesia yang telah diaudit terhadap 699 halaman material training PAM Administrator, termasuk detail teknis mikro dan analisis penerapan.', 'This curriculum contains 20 self-contained Indonesian chapters audited against all 699 pages of the PAM Administrator training material.');
+      summaryEntry.simple = R('Belajar langsung di Rolebook: definisi, fungsi, alur internal, command, parameter, object bawaan, limit, workflow administrator, investigasi L2, evidence, skenario, analisis desain, dan ide pengembangan tersedia tanpa harus membuka slide.', 'Learn directly in the Rolebook without opening the slides.');
+      summaryEntry.sections = [
+        {title:R('Hasil audit 699 halaman','699-page audit result'),paragraphs:[{text:R('Dua puluh PDF berjumlah 699 halaman telah dicocokkan dengan bab M01–M20. Cover, agenda, divider, summary, exercise, dan resource page dicatat; seluruh teaching point substantif diterjemahkan menjadi penjelasan, sedangkan screenshot UI diterangkan sebagai workflow dan keputusan operasional, bukan disalin pixel demi pixel.','All 699 pages were mapped to M01–M20.')}],bullets:A(ms.map(item=>`M${item.n}: ${window.IDIRA_TRAINING_EXPANSIONS?.[item.n]?.coverageNote || 'Cakupan utama terpetakan.'}`),ms.map(item=>`M${item.n}: source coverage mapped.`))},
+        {title:R('Cara membedakan sumber dan analisis','Source versus analysis'),paragraphs:[{text:R('Kotak SOURCE ADDENDUM berisi parafrasa faktual dari material training. Kotak ANALISIS & PENGEMBANGAN ROLEBOOK berisi sintesis, penerapan, dan brainstorming tambahan; label ini mencegah analisis internal disalahartikan sebagai kutipan atau klaim resmi produk.','Source addenda are separated from Rolebook analysis.')}],bullets:A(['Nama file, parameter, command, object, port, limit, dan urutan flow dipertahankan bila diperlukan.','Analisis desain, maturity, automation, dan troubleshooting diberi label bukan kutipan literal slide.','Tindakan produksi tetap harus mengikuti SOP, change control, support matrix, dan build customer.'],['Exact technical identifiers are retained where needed.','Analysis is explicitly labeled as non-source synthesis.','Production actions still require build-specific validation.'])}
+      ];
+      summaryEntry.readingTime = 55;
       summaryEntry.lastReviewed = '2026-08-17';
     }
   }
